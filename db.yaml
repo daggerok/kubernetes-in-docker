@@ -14,7 +14,7 @@ kind: List
     #- ReadWriteMany
     resources:
       requests:
-        torage: 1Gi
+        storage: 1Gi
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
