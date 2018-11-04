@@ -4,7 +4,12 @@ metadata:
   name: db-pvc
 spec:
   accessMode:
+  # can be used by single node only
   - ReadWriteOnce
+  ## can be read by many nodes:
+  #- ReadOnlyMany
+  ## can be read and writed by many nodes
+  #- ReadWriteMany
   resources:
     requests:
       torage: 1Gi
