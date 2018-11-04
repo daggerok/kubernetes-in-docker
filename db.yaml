@@ -47,6 +47,7 @@ kind: List
   metadata:
     name: db-clister-ip-service
   spec:
+    type: ClusterIP
     selector:
       run: postgres
     ports:
