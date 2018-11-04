@@ -5,7 +5,7 @@ kind: List
   metadata:
     name: db-pvc
   spec:
-    accessMode:
+    accessModes:
     # can be used by single node only
     - ReadWriteOnce
     ## can be read by many nodes:
