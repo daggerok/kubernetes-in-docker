@@ -36,7 +36,7 @@ items:
   metadata:
     labels:
       component: web
-    name: web
+    name: web-svc
   spec:
     ports:
     - nodePort: 30000
@@ -86,7 +86,7 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: postgres-clister-ip-service
+    name: postgres-clister-ip-svc
   spec:
     type: ClusterIP
     selector:
