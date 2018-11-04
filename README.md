@@ -214,6 +214,57 @@ kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP        1h
 web          NodePort    10.104.17.108   <none>        80:30000/TCP   10m
 ```
 
-Now we finnaly can use out app on http://localhost:30000
+Now we can use out app on http://localhost:30000
+
+## Some advanced stuff
+
+### expose app on previliged port (80)
+
+If you will try set in `/tmp/web-service.yaml` file: `spec.ports[0].nodePort = 8080`, or any other < 30000 value, during kubectl apply you will get an error like this:
+
+```bash
+➜  ~ kubectl apply -f /tmp/web-service.yaml
+Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
+The Service "web" is invalid: spec.ports[0].nodePort: Invalid value: 8080: provided port is not in the valid range. The range of valid ports is 30000-32767
+```
+
+TODO: Investigate how we can fix it...
+
+<!--
+
+As you can see, by default, `service-node-port-range` parameter is: `30000-32767`. Bu we can try fix that...
+Let's re-configure `kubeadm-config` configmap in `kube-system` namespace:
+
+```bash
+kubectl edit configmap kubeadm-config -n kube-system
+```
+
+and add `data.apiServerExtraArgs.service-node-port-range: 80-65535` value
+
+```bash
+apiVersion: v1¬
+data:¬
+  MasterConfiguration: |¬
+    api:¬
+      advertiseAddress: 192.168.65.3¬
+      bindPort: 6443¬
+      controlPlaneEndpoint: ""¬
+    apiServerExtraArgs:¬
+      # https://github.com/kubernetes/kubernetes/blob/v1.10.3/cmd/kube-apiserver/app/server.go#L394¬
+      # https://github.com/kubernetes/kubeadm/issues/122#issuecomment-392107992¬
+      service-node-port-range: 80-65535
+```
+
+![Fix ServiceNodePortRange](./03-service-node-port-range-80-65535.png)
+
+Now let's update NodePort in `/tmp/web-service.yaml` file to 80:
+
+![NodePort: 80](./04-service-with-node-port-80.png)
+
+And re-apply web service:
 
 Done.
+
+Nope, this shit down work.
+
+-->
