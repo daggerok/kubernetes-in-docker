@@ -51,6 +51,6 @@ kind: List
     selector:
       run: postgres
     ports:
-    - protocol: TCP
-      port: 5432
+    - port: 5432
+      protocol: TCP
       targetPort: 5432
