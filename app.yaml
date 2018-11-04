@@ -109,7 +109,7 @@ items:
       component: postgres
     ports:
     - protocol: TCP
-      nodePort: 30001
+      nodePort: 32345
       port: 5432
       targetPort: 5432
 - apiVersion: v1
