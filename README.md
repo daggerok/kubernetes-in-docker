@@ -102,7 +102,7 @@ With that we make sure that nginx web container is running and handling traffic
 
 ## Behind the basics
 
-### expose node port using service (for production use)
+### expose node port (as random) by using service (for production use)
 
 ```bash
 ➜  ~ kubectl expose deployment web --port 80 --type NodePort
@@ -160,3 +160,60 @@ Commercial support is available at
 ```
 
 and it does.
+
+### expose NodePort as concrete target port (minimal is: 30000)
+
+Now I would like to use reverse-engineering principle to get current kubernetes service definition into yaml file:
+
+```bash
+➜  ~ kubectl get service web -o yaml > /tmp/web-service.yaml
+```
+
+Not let's correct our service definition like so:
+
+```bash
+➜  ~ cat /tmp/web-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: web
+  name: web
+  namespace: default
+  selfLink: /api/v1/namespaces/default/services/web
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 30000
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    run: web
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer:
+    ingress:
+    - hostname: localhost
+```
+
+Now we can re-create web service:
+
+```bash
+➜  ~ kubectl apply -f /tmp/web-service.yaml
+Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
+service "web" configured
+```
+
+Verify service was updated as expected:
+
+```bash
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP        1h
+web          NodePort    10.104.17.108   <none>        80:30000/TCP   10m
+```
+
+Now we finnaly can use out app on http://localhost:30000
+
+Done.
