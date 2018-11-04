@@ -36,8 +36,9 @@ items:
   metadata:
     labels:
       component: web
-    name: web-svc
+    name: web-node-port-svc
   spec:
+    type: NodePort
     ports:
     - nodePort: 30000
       port: 80
@@ -45,7 +46,6 @@ items:
       targetPort: 80
     selector:
       component: web
-    type: NodePort
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -86,6 +86,8 @@ items:
 - apiVersion: v1
   kind: Service
   metadata:
+    labels:
+      component: postgres
     name: postgres-clister-ip-svc
   spec:
     type: ClusterIP
