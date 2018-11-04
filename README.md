@@ -268,3 +268,15 @@ Done.
 Nope, this shit down work.
 
 -->
+
+## app (all.yasml)
+
+Setup:
+```bash
+kubectl apply -f /tmp/app.yaml
+```
+
+Verify:
+```bash
+kubectl get -f /tmp/app.yaml
+```
