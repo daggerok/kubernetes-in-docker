@@ -36,13 +36,27 @@ items:
   metadata:
     labels:
       component: web
-    name: web-node-port-svc
+    name: web-node-port-dev-svc
   spec:
     type: NodePort
     ports:
-    - nodePort: 30000
+    - protocol: TCP
+      nodePort: 30000
       port: 80
-      protocol: TCP
+      targetPort: 80
+    selector:
+      component: web
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      component: web
+    name: web-cluster-ip-svc
+  spec:
+    type: ClusterIP
+    ports:
+    - protocol: TCP
+      port: 80
       targetPort: 80
     selector:
       component: web
@@ -83,6 +97,21 @@ items:
           - name: postgres-storage
             mountPath: /var/lib/postgresql/data
             subPath: postgres
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      component: postgres
+    name: postgres-node-port-dev-svc
+  spec:
+    type: NodePort
+    selector:
+      component: postgres
+    ports:
+    - protocol: TCP
+      nodePort: 30001
+      port: 5432
+      targetPort: 5432
 - apiVersion: v1
   kind: Service
   metadata:
