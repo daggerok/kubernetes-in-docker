@@ -1,15 +1,17 @@
 # kubernetes-in-docker-for-mac
 Getting started with k8s on Docker for Mac / Windows
 
-## enable kubernetes in Docker for Mac / Windows
+## Basics
+
+### enable kubernetes in Docker for Mac / Windows
 ![Enable k8s](./01-enable-k8s.png)
 
-## install kubectl auto-completeon (zsh)
+### install kubectl auto-completeon (zsh)
 I'm using zsh, so all I need to do is add kubectl to plugins section
 
 ![Enable kubectl auto-completion](./02-auto-completion.png)
 
-## testing kubernetes setup
+### testing kubernetes setup
 So now we are ready to go with k8s!
 
 Let's run nginx:
@@ -39,7 +41,7 @@ NAME                 READY     STATUS    RESTARTS   AGE
 web-bbcdd5f4-zqq5x   1/1       Running   0          5m
 ```
 
-## deep dive
+### deep dive
 Let's get more information about our nginx web deployment
 
 ```bash
@@ -77,7 +79,7 @@ Events:
   Normal  ScalingReplicaSet  7m    deployment-controller  Scaled up replica set web-bbcdd5f4 to 1
 ```
 
-## expose (access) kubernetes pod
+### expose (access) kubernetes pod (for debug / development use)
 Let's test our nginx web app. We can access web deployment via it's pod, so let's do that!
 
 First of all we need to get nginx web pod name
@@ -95,3 +97,66 @@ Forwarding from [::1]:8080 -> 80
 ```
 
 Now, let's <a href="http://127.0.0.1:8080/" target="_blank">test</a> if it's working...
+
+With that we make sure that nginx web container is running and handling traffic
+
+## Behind the basics
+
+### expose node port using service (for production use)
+
+```bash
+➜  ~ kubectl expose deployment web --port 80 --type NodePort
+service "web" exposed
+```
+
+Let's get services we currently have:
+
+```bash
+➜  ~ kubectl get service
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP        1h
+web          NodePort    10.110.125.231   <none>        80:30906/TCP   50s
+```
+
+As you ca nsee port 80 of nginx web deploymemnt locally exposed on port 30906. Let's test this time if port 30906 is actually working:
+
+```bash
+➜  ~ http :30906
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Connection: keep-alive
+Content-Length: 612
+Content-Type: text/html
+Date: Sun, 04 Nov 2018 14:18:30 GMT
+ETag: "5bb3c541-264"
+Last-Modified: Tue, 02 Oct 2018 19:21:37 GMT
+Server: nginx/1.15.5
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+
+and it does.
