@@ -76,3 +76,22 @@ Events:
   ----    ------             ----  ----                   -------
   Normal  ScalingReplicaSet  7m    deployment-controller  Scaled up replica set web-bbcdd5f4 to 1
 ```
+
+## expose (access) kubernetes pod
+Let's test our nginx web app. We can access web deployment via it's pod, so let's do that!
+
+First of all we need to get nginx web pod name
+```bash
+➜  ~ kubectl get pod
+NAME                 READY     STATUS    RESTARTS   AGE
+web-bbcdd5f4-zqq5x   1/1       Running   0          9m
+```
+
+Now we can forward nginx pod port exposed by default (80) to for example local port 8080 just like so:
+```bash
+➜  ~ kubectl port-forward web-bbcdd5f4-zqq5x 8080:80
+Forwarding from 127.0.0.1:8080 -> 80
+Forwarding from [::1]:8080 -> 80
+```
+
+Now, let's<a href="http://127.0.0.1:8080/" target="_blank">test</a> if it's working...
