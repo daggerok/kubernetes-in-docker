@@ -1,4 +1,4 @@
-# kubernetes-in-docker-for-mac
+# kubernetes-in-docker (for mac or windows)
 Getting started with k8s on Docker for Mac / Windows
 
 ## Basics
