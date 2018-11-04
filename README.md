@@ -273,10 +273,29 @@ Nope, this shit down work.
 
 Setup:
 ```bash
-kubectl apply -f /tmp/app.yaml
+➜  kubectl apply -f /tmp/app.yaml
+deployment.apps "web" created
+service "web-node-port-svc" created
+persistentvolumeclaim "db-pvc" created
+deployment.apps "postgres" created
+service "postgres-clister-ip-svc" created
 ```
 
 Verify:
 ```bash
-kubectl get -f /tmp/app.yaml
+➜  kubectl get -f /tmp/app.yaml
+NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/web   2         2         2            2           2m
+
+NAME                        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+service/web-node-port-svc   NodePort   10.105.168.94   <none>        80:30000/TCP   2m
+
+NAME                           STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+persistentvolumeclaim/db-pvc   Bound     pvc-24506c9c-e081-11e8-8f20-025000000001   1Gi        RWO            hostpath       2m
+
+NAME                       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/postgres   1         1         1            1           2m
+
+NAME                              TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+service/postgres-clister-ip-svc   ClusterIP   10.99.96.52   <none>        5432/TCP   2m
 ```
