@@ -269,7 +269,7 @@ Nope, this shit down work.
 
 -->
 
-## app (all.yasml)
+## app (all.yaml)
 
 Setup:
 ```bash
