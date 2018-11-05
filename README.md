@@ -274,11 +274,14 @@ Nope, this shit down work.
 Setup:
 ```bash
 ➜  kubectl apply -f /tmp/app.yaml
-deployment.apps "web" created
-service "web-node-port-svc" created
+secret "postgres-password-secret" created
 persistentvolumeclaim "db-pvc" created
 deployment.apps "postgres" created
+service "postgres-node-port-dev-svc" created
 service "postgres-clister-ip-svc" created
+deployment.apps "web" created
+service "web-node-port-dev-svc" created
+service "web-cluster-ip-svc" created
 ```
 
 Verify:
