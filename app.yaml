@@ -2,7 +2,7 @@ apiVersion: v1
 kind: List
 items:
 
-### ONLY FOR DEVELOPMENT BEGIN: ###
+### ONLY FOR DEVELOPMENT: BEGIN ###
 - apiVersion: v1
   kind: Secret
   metadata:
