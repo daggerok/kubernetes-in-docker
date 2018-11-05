@@ -1,65 +1,26 @@
 apiVersion: v1
 kind: List
 items:
-- apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    labels:
-      component: web
-    name: web
-  spec:
-    progressDeadlineSeconds: 600
-    replicas: 2
-    revisionHistoryLimit: 10
-    selector:
-      matchLabels:
-        component: web
-    strategy:
-      rollingUpdate:
-        maxSurge: 1
-        maxUnavailable: 1
-      type: RollingUpdate
-    template:
-      metadata:
-        labels:
-          component: web
-      spec:
-        containers:
-        - image: nginx:1.15.5-alpine
-          imagePullPolicy: IfNotPresent
-          name: web
-        dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        terminationGracePeriodSeconds: 30
+
+### ONLY FOR DEVELOPMENT BEGIN: ###
 - apiVersion: v1
-  kind: Service
+  kind: Secret
   metadata:
     labels:
-      component: web
-    name: web-node-port-dev-svc
-  spec:
-    type: NodePort
-    ports:
-    - protocol: TCP
-      nodePort: 30000
-      port: 80
-      targetPort: 80
-    selector:
-      component: web
-- apiVersion: v1
-  kind: Service
-  metadata:
-    labels:
-      component: web
-    name: web-cluster-ip-svc
-  spec:
-    type: ClusterIP
-    ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-    selector:
-      component: web
+      component: postgres
+    name: postgres-password-secret
+  type: Opaque
+  data:
+    POSTGRES_PASSWORD: cG9zdGdyZXM=
+    # $(echo -n 'postgres'  | base64)                       == cG9zdGdyZXM=
+    # $(echo 'cG9zdGdyZXM=' | base64 --decode)              == postgres
+    # $(echo 'cG9zdGdyZXM=' | base64 --decode | tr -d '\n') == postgres
+    # https://kubernetes.io/docs/concepts/configuration/secret/
+### ONLY FOR DEVELOPMENT: END ###
+## in production, secrets should be added manually, like so:
+# kubectl create secret generic postgres-password-secret --from-literal POSTGRES_PASSWORD=postgres
+
+
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
@@ -90,13 +51,24 @@ items:
             claimName: db-pvc
         containers:
         - name: postgres
-          image: healthcheck/postgres
+          image: healthcheck/postgres:alpine
           ports:
           - containerPort: 5432
           volumeMounts:
           - name: postgres-storage
             mountPath: /var/lib/postgresql/data
             subPath: postgres
+          env:
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_DB
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-password-secret
+                key: POSTGRES_PASSWORD
+### ONLY FOR DEVELOPMENT: BEGIN ###
 - apiVersion: v1
   kind: Service
   metadata:
@@ -112,6 +84,7 @@ items:
       nodePort: 32345
       port: 5432
       targetPort: 5432
+### ONLY FOR DEVELOPMENT: END ###
 - apiVersion: v1
   kind: Service
   metadata:
@@ -126,3 +99,81 @@ items:
     - protocol: TCP
       port: 5432
       targetPort: 5432
+
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    labels:
+      component: web
+    name: web
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        component: web
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          component: web
+      spec:
+        containers:
+        - image: nginx:1.15.5-alpine
+          imagePullPolicy: IfNotPresent
+          name: web
+          env:
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_DB
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-password-secret
+                key: POSTGRES_PASSWORD
+          # additional, non-postgres image related env variables
+          - name: POSTGRES_HOST
+            value: postgres-cluster-ip-svc
+          - name: POSTGRES_PORT
+            value: 5432
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+### ONLY FOR DEVELOPMENT: BEGIN ###
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      component: web
+    name: web-node-port-dev-svc
+  spec:
+    type: NodePort
+    ports:
+    - protocol: TCP
+      nodePort: 30000
+      port: 80
+      targetPort: 80
+    selector:
+      component: web
+### ONLY FOR DEVELOPMENT: END ###
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      component: web
+    name: web-cluster-ip-svc
+  spec:
+    type: ClusterIP
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+    selector:
+      component: web
