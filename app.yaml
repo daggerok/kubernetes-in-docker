@@ -66,7 +66,7 @@ items:
             valueFrom:
               secretKeyRef:
                 name: postgres-password-secret
-                key: "POSTGRES_PASSWORD"
+                key: POSTGRES_PASSWORD
 ### ONLY FOR DEVELOPMENT: BEGIN ###
 - apiVersion: v1
   kind: Service
@@ -136,7 +136,7 @@ items:
             valueFrom:
               secretKeyRef:
                 name: postgres-password-secret
-                key: "POSTGRES_PASSWORD"
+                key: POSTGRES_PASSWORD
           # additional, non-postgres image related env variables
           - name: POSTGRES_HOST
             value: postgres-cluster-ip-svc
