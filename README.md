@@ -284,18 +284,23 @@ service "postgres-clister-ip-svc" created
 Verify:
 ```bash
 ➜  kubectl get -f /tmp/app.yaml
-NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/web   2         2         2            2           2m
+NAME                              TYPE      DATA      AGE
+secret/postgres-password-secret   Opaque    1         3s
 
-NAME                        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-service/web-node-port-svc   NodePort   10.105.168.94   <none>        80:30000/TCP   2m
-
-NAME                           STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-persistentvolumeclaim/db-pvc   Bound     pvc-24506c9c-e081-11e8-8f20-025000000001   1Gi        RWO            hostpath       2m
+NAME                           STATUS    VOLUME    CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+persistentvolumeclaim/db-pvc   Pending                                       hostpath       3s
 
 NAME                       DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/postgres   1         1         1            1           2m
+deployment.apps/postgres   1         1         1            0           3s
 
-NAME                              TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
-service/postgres-clister-ip-svc   ClusterIP   10.99.96.52   <none>        5432/TCP   2m
+NAME                                 TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+service/postgres-node-port-dev-svc   NodePort    10.107.237.57   <none>        5432:32345/TCP   3s
+service/postgres-clister-ip-svc      ClusterIP   10.110.232.11   <none>        5432/TCP         3s
+
+NAME                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/web   2         2         2            2           3s
+
+NAME                            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+service/web-node-port-dev-svc   NodePort    10.97.202.253   <none>        80:30000/TCP   3s
+service/web-cluster-ip-svc      ClusterIP   10.96.135.4     <none>        80/TCP         3s
 ```
