@@ -9,13 +9,12 @@ items:
     labels:
       component: postgres
     name: postgres-password-secret
-  type: Opaque
   data:
     POSTGRES_PASSWORD: cG9zdGdyZXM=
-    # $(echo -n 'postgres'  | base64)                       == cG9zdGdyZXM=
-    # $(echo 'cG9zdGdyZXM=' | base64 --decode)              == postgres
-    # $(echo 'cG9zdGdyZXM=' | base64 --decode | tr -d '\n') == postgres
-    # https://kubernetes.io/docs/concepts/configuration/secret/
+# $(echo -n 'postgres'  | base64)                       == cG9zdGdyZXM=
+# $(echo 'cG9zdGdyZXM=' | base64 --decode)              == postgres
+# $(echo 'cG9zdGdyZXM=' | base64 --decode | tr -d '\n') == postgres
+# https://kubernetes.io/docs/concepts/configuration/secret/
 ### ONLY FOR DEVELOPMENT: END ###
 ## in production, secrets should be added manually, like so:
 # kubectl create secret generic postgres-password-secret --from-literal POSTGRES_PASSWORD=postgres
@@ -67,7 +66,7 @@ items:
             valueFrom:
               secretKeyRef:
                 name: postgres-password-secret
-                key: POSTGRES_PASSWORD
+                key: "POSTGRES_PASSWORD"
 ### ONLY FOR DEVELOPMENT: BEGIN ###
 - apiVersion: v1
   kind: Service
@@ -137,12 +136,12 @@ items:
             valueFrom:
               secretKeyRef:
                 name: postgres-password-secret
-                key: POSTGRES_PASSWORD
+                key: "POSTGRES_PASSWORD"
           # additional, non-postgres image related env variables
           - name: POSTGRES_HOST
             value: postgres-cluster-ip-svc
           - name: POSTGRES_PORT
-            value: 5432
+            value: "5432"
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         terminationGracePeriodSeconds: 30
